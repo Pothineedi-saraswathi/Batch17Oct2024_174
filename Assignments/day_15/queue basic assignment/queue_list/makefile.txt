@@ -1,0 +1,23 @@
+CC = gcc
+CFLAGS = -Iinclude -Wall -g
+
+SRC = src
+BIN = bin
+OBJ = obj
+TARGET = $(BIN)/queue_app
+
+SRCS = $(wildcard $(SRC)/*.c)
+OBJS = $(SRCS:$(SRC)/%.c=$(OBJ)/%.o)
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	mkdir -p $(BIN)
+	$(CC) $(CFLAGS) -o $@ $^
+
+$(OBJ)/%.o: $(SRC)/%.c
+	mkdir -p $(OBJ)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -rf $(OBJ) $(BIN)

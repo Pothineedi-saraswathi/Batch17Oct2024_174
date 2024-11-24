@@ -1,0 +1,171 @@
+1. WAP to prompt and read a line of text with words separated by space. Tokenise and extract the words. Display them. Impement the following functions for this.
+	a. int tokenise(char *arr); //tokenise and display tokens , return number of tokens 	to the caller
+	[Use strtok() to tokenise]
+
+A. 
+/*************************************************************************
+*
+*  FILE NAME    : string_tokenise.c
+*
+*  DESCRIPTION  : Tokenize a line of text into words and display them.
+*
+*  DATE      NAME                   REFERENCE             REASON
+*
+*  21-NOV-24 pothineedi saraswathi                     Initial creation
+*
+**************************************************************************/
+#include <stdio.h>
+#include <string.h>
+
+/*************************************************************************
+*       Function Name   : tokenise
+*       Description     : Tokenize and display tokens
+*       Input           : A string of text
+*       Returns         : Number of tokens
+*************************************************************************/
+
+int tokenise(char *arr);
+
+int main() {
+    char input[100]; // Buffer to hold the input string
+    printf("Enter a line of text: ");
+    fgets(input, sizeof(input), stdin);
+
+    // Remove newline character if present
+    size_t len = strlen(input);
+    if (len > 0 && input[len - 1] == '\n') {
+        input[len - 1] = '\0';
+    }
+
+    int num_tokens = tokenise(input);
+    printf("Number of tokens: %d\n", num_tokens);
+
+    return 0;
+}
+
+int tokenise(char *arr) {
+    int count = 0;
+    char *token = strtok(arr, " ");
+    while (token != NULL) {
+        printf("Token: %s\n", token);
+        count++;
+        token = strtok(NULL, " ");
+    }
+    return count;
+}
+-------------------------------------------------------------------------------------------
+2. Implement your own strncat() which shall concatenate n characters from src to dest.
+	char *strncat(char *dest, const char *src, size_t n)
+A.
+/*************************************************************************
+*
+*  FILE NAME    : custom_strncat.c
+*
+*  DESCRIPTION  : Implementation of custom strncat function.
+*
+*  DATE      NAME                     REFERENCE          REASON
+*
+*  21-NOV-24 pothineedi saraswathi                     Initial creation
+*
+**************************************************************************/
+#include <stdio.h>
+#include<string.h>
+
+/*************************************************************************
+*       Function Name   : custom_strncat
+*       Description     : Concatenate `n` characters from src to dest
+*       Input           : Destination string, Source string, Number of characters
+*       Returns         : Pointer to destination string
+*************************************************************************/
+char *strncat(char *dest, const char *src, size_t n) {
+    char *dest_ptr = dest;
+
+    // Move dest_ptr to the end of the destination string
+    while (*dest_ptr != '\0') {
+        dest_ptr++;
+    }
+
+    // Append up to n characters from src to dest
+    while (n-- && *src != '\0') {
+        *dest_ptr++ = *src++;
+    }
+
+    // Null-terminate the destination string
+    *dest_ptr = '\0';
+
+    return dest;
+}
+
+int main() {
+    char dest[100] = "Hello, ";
+    const char *src = "World!";
+    size_t n = 3;
+
+    strncat(dest, src, n);
+    printf("Resulting string: %s\n", dest);
+
+    return 0;
+}
+-------------------------------------------------------------------------------------------
+3. WAP to
+a. Search for and replace the vowel characters (upper and lower case) with “ay” in a word read from user. Consider a maximum word length of 40 characters.
+b. Identify the test inputs to be used
+c. Display updated string
+A. 
+/*************************************************************************
+*
+*  FILE NAME    : replace_vowels.c
+*
+*  DESCRIPTION  : Replaces vowels in a word with "ay".
+*
+*  DATE        NAME                  REFERENCE          REASON
+*
+*  21-NOV-24 pothineedi sarawathi                     Initial creation
+*
+**************************************************************************/
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+/*************************************************************************
+*       Function Name   : replace_vowels
+*       Description     : Replace vowels in the input word with "ay".
+*       Input           : Word from user
+*       Returns         : None
+*************************************************************************/
+
+void replace_vowels(char *input, char *output);
+
+int main() {
+    char input[41]; // Buffer to hold the input string (40 characters + 1 for null terminator)
+    char output[121]; // Buffer to hold the output string (considering maximum replacements)
+
+    printf("Enter a word (max 40 characters): ");
+    fgets(input, sizeof(input), stdin);
+
+    // Remove newline character if present
+    size_t len = strlen(input);
+    if (len > 0 && input[len - 1] == '\n') {
+        input[len - 1] = '\0';
+    }
+
+    replace_vowels(input, output);
+    printf("Updated string: %s\n", output);
+
+    return 0;
+}
+
+void replace_vowels(char *input, char *output) {
+    char *vowels = "aeiouAEIOU";
+    int j = 0;
+
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (strchr(vowels, input[i]) != NULL) {
+            output[j++] = 'a';
+            output[j++] = 'y';
+        } else {
+            output[j++] = input[i];
+        }
+    }
+    output[j] = '\0'; // Null-terminate the output string
+}

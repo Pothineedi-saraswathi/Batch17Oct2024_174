@@ -1,0 +1,238 @@
+1. Refer the code below and find the issue.
+
+#include<stdio.h>
+int *func(void);
+int main()
+{
+int num,*ptr = NULL;
+ptr = (int *)func();
+num = *ptr;
+return 1;
+}
+int *func()
+{
+int local;
+local = 10;
+return(&local);
+}
+In above code is there a way(s) to return local variable address to caller?
+A.
+ The issue with the code is that it returns the address of a local variable (local) from the function func(). Local variables are stored on the stack, and their memory is deallocated once the function returns. This means that the pointer ptr in main() will point to a memory location that is no longer valid, leading to undefined behavior.
+1.Using Dynamic Memory Allocation
+
+#include <stdio.h>
+#include <stdlib.h>
+int *func(void);
+int main() {
+    int num, *ptr = NULL;
+    ptr = func();
+    if (ptr != NULL) {
+        num = *ptr;
+        printf("Value: %d\n", num);
+        free(ptr); // Don't forget to free the allocated memory
+    }
+    return 0;
+}
+int *func() {
+    int *local = (int *)malloc(sizeof(int));
+    if (local != NULL) {
+        *local = 10;
+    }
+    return local;
+}
+
+2.Using a Pointer Parameter
+
+#include <stdio.h>
+
+void func(int *ptr);
+
+int main() {
+    int num;
+    func(&num);
+    printf("Value: %d\n", num);
+    return 0;
+}
+
+void func(int *ptr) {
+    *ptr = 10;
+}
+3.Using Static Variables
+
+#include <stdio.h>
+
+int *func(void);
+
+int main() {
+    int num, *ptr = NULL;
+    ptr = func();
+    num = *ptr;
+    printf("Value: %d\n", num);
+    return 0;
+}
+
+int *func() {
+    static int local;
+    local = 10;
+    return &local;
+}
+-------------------------------------------------------------------------------------------
+2. Write a program with a function read_extract_characters() to read a string (of max length 50 characters) from user, extract the characters at odd indices, store in an other array and return to the call. Caller should be able to read and display the extracted string.
+
+[Note : do not return a local variable in function to caller]
+A.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char* read_extract_characters();
+
+int main() {
+    char *extracted_string = read_extract_characters();
+    if (extracted_string != NULL) {
+        printf("Extracted string: %s\n", extracted_string);
+        free(extracted_string); // Free the allocated memory
+    } else {
+        printf("Memory allocation failed.\n");
+    }
+    return 0;
+}
+
+char* read_extract_characters() {
+    char input[51]; // 50 characters + 1 for null terminator
+    printf("Enter a string (max 50 characters): ");
+    fgets(input, sizeof(input), stdin);
+    
+    // Remove newline character if present
+    size_t len = strlen(input);
+    if (len > 0 && input[len - 1] == '\n') {
+        input[len - 1] = '\0';
+    }
+
+    // Allocate memory for the extracted string
+    char *extracted = (char *)malloc((len / 2 + 1) * sizeof(char));
+    if (extracted == NULL) {
+        return NULL; // Memory allocation failed
+    }
+
+    int j = 0;
+    for (int i = 1; i < len; i += 2) {
+        extracted[j++] = input[i];
+    }
+    extracted[j] = '\0'; // Null-terminate the extracted string
+
+    return extracted;
+}
+-------------------------------------------------------------------------------------------
+Write below functions to extract and return the required inputs from an email id string of max length 80 characters. Program should be able to detect an invalid email id too based on following validations. Also value returned should be in scope and accessible in caller.
+
+a. valid email id will have username, host and domain name (as .com/.edu)
+
+
+Functions:
+
+char *getuser(char input[]); // return NULL or valid username from email id input
+char *gethost(char input[]); //return NULL or valid hostname from email id input
+char *getdomain(char input[]); //return NULL or valid domain name from email id input
+int isValidDomain(char input[]); // return 1 if domain is “.com” or “.edu” else 0
+A.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char *getuser(char input[]);
+char *gethost(char input[]);
+char *getdomain(char input[]);
+int isValidDomain(char input[]);
+
+int main() {
+    char email[81]; // 80 characters + 1 for null terminator
+    printf("Enter an email ID (max 80 characters): ");
+    fgets(email, sizeof(email), stdin);
+
+    // Remove newline character if present
+    size_t len = strlen(email);
+    if (len > 0 && email[len - 1] == '\n') {
+        email[len - 1] = '\0';
+    }
+
+    char *user = getuser(email);
+    char *host = gethost(email);
+    char *domain = getdomain(email);
+
+    if (user && host && domain && isValidDomain(domain)) {
+        printf("Username: %s\n", user);
+        printf("Host: %s\n", host);
+        printf("Domain: %s\n", domain);
+    } else {
+        printf("Invalid email ID.\n");
+    }
+
+    // Free allocated memory
+    free(user);
+    free(host);
+    free(domain);
+
+    return 0;
+}
+
+char *getuser(char input[]) {
+    char *at_sign = strchr(input, '@');
+    if (at_sign == NULL) {
+        return NULL;
+    }
+
+    size_t user_len = at_sign - input;
+    char *user = (char *)malloc((user_len + 1) * sizeof(char));
+    if (user == NULL) {
+        return NULL;
+    }
+
+    strncpy(user, input, user_len);
+    user[user_len] = '\0';
+    return user;
+}
+
+char *gethost(char input[]) {
+    char *at_sign = strchr(input, '@');
+    if (at_sign == NULL) {
+        return NULL;
+    }
+
+    char *dot = strchr(at_sign + 1, '.');
+    if (dot == NULL) {
+        return NULL;
+    }
+
+    size_t host_len = dot - at_sign - 1;
+    char *host = (char *)malloc((host_len + 1) * sizeof(char));
+    if (host == NULL) {
+        return NULL;
+    }
+
+    strncpy(host, at_sign + 1, host_len);
+    host[host_len] = '\0';
+    return host;
+}
+
+char *getdomain(char input[]) {
+    char *dot = strrchr(input, '.');
+    if (dot == NULL) {
+        return NULL;
+    }
+
+    size_t domain_len = strlen(dot);
+    char *domain = (char *)malloc((domain_len + 1) * sizeof(char));
+    if (domain == NULL) {
+        return NULL;
+    }
+
+    strcpy(domain, dot);
+    return domain;
+}
+
+int isValidDomain(char input[]) {
+    return (strcmp(input, ".com") == 0 || strcmp(input, ".edu") == 0);
+}

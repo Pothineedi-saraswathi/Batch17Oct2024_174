@@ -1,0 +1,241 @@
+1. WAP to define read and store the following details together in a structure and display the structure details
+name – char* [input could of maximum length 50 char]
+age – uint
+designation – enum [use the enum values used in enum exercise]
+void read (EMP *emp)
+void display (EMP emp);
+Implement additional function below.
+//read and update the employee record
+int update(EMP *emp);
+//copy the emp to a new employee and return
+EMP copy(EMP emp);
+
+A.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define the enum for designation
+typedef enum {
+    MANAGER,
+    ENGINEER,
+    TECHNICIAN,
+    CLERK
+} Designation;
+
+// Define the structure for employee
+typedef struct {
+    char name[51]; // Fixed size array for name
+    unsigned int age;
+    Designation designation;
+} EMP;
+
+// Function prototypes
+void read(EMP *emp);
+void display(EMP emp);
+int update(EMP *emp);
+EMP copy(EMP emp);
+
+int main() {
+    EMP emp1;
+
+    read(&emp1);
+    display(emp1);
+
+    if (update(&emp1)) {
+        printf("Employee record updated successfully.\n");
+    } else {
+        printf("Failed to update employee record.\n");
+    }
+
+    display(emp1);
+
+    EMP emp2 = copy(emp1);
+    printf("Copied employee details:\n");
+    display(emp2);
+
+    return 0;
+}
+
+void read(EMP *emp) {
+    printf("Enter name (max 50 characters): ");
+    fgets(emp->name, sizeof(emp->name), stdin);
+    // Remove newline character if present
+    size_t len = strlen(emp->name);
+    if (len > 0 && emp->name[len - 1] == '\n') {
+        emp->name[len - 1] = '\0';
+    }
+
+    printf("Enter age: ");
+    scanf("%u", &emp->age);
+
+    printf("Enter designation (0 for MANAGER, 1 for ENGINEER, 2 for TECHNICIAN, 3 for CLERK): ");
+    int desig;
+    scanf("%d", &desig);
+    emp->designation = (Designation)desig;
+
+    // Clear the input buffer
+    while (getchar() != '\n');
+}
+
+void display(EMP emp) {
+    printf("Name: %s\n", emp.name);
+    printf("Age: %u\n", emp.age);
+    printf("Designation: ");
+    switch (emp.designation) {
+        case MANAGER: printf("MANAGER\n"); break;
+        case ENGINEER: printf("ENGINEER\n"); break;
+        case TECHNICIAN: printf("TECHNICIAN\n"); break;
+        case CLERK: printf("CLERK\n"); break;
+        default: printf("UNKNOWN\n"); break;
+    }
+}
+
+int update(EMP *emp) {
+    printf("Update name (max 50 characters): ");
+    fgets(emp->name, sizeof(emp->name), stdin);
+    // Remove newline character if present
+    size_t len = strlen(emp->name);
+    if (len > 0 && emp->name[len - 1] == '\n') {
+        emp->name[len - 1] = '\0';
+    }
+
+    printf("Update age: ");
+    if (scanf("%u", &emp->age) != 1) {
+        return 0; // Failed to read age
+    }
+
+    printf("Update designation (0 for MANAGER, 1 for ENGINEER, 2 for TECHNICIAN, 3 for CLERK): ");
+    int desig;
+    if (scanf("%d", &desig) != 1) {
+        return 0; // Failed to read designation
+    }
+    emp->designation = (Designation)desig;
+
+    // Clear the input buffer
+    while (getchar() != '\n');
+
+    return 1; // Successfully updated
+}
+
+EMP copy(EMP emp) {
+    EMP new_emp;
+    strcpy(new_emp.name, emp.name);
+    new_emp.age = emp.age;
+    new_emp.designation = emp.designation;
+    return new_emp;
+}
+-------------------------------------------------------------------------------------------
+2. Extend the above program and create and initialize an array of 3 structures. Reuse the read() and display() functions to read, initialize and display structures
+A.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define the enum for designation
+typedef enum {
+    MANAGER,
+    ENGINEER,
+    TECHNICIAN,
+    CLERK
+} Designation;
+
+// Define the structure for employee
+typedef struct {
+    char name[51]; // Fixed size array for name
+    unsigned int age;
+    Designation designation;
+} EMP;
+
+// Function prototypes
+void read(EMP *emp);
+void display(EMP emp);
+int update(EMP *emp);
+EMP copy(EMP emp);
+
+int main() {
+    EMP employees[3]; // Array of 3 EMP structures
+
+    // Read and initialize the array of structures
+    for (int i = 0; i < 3; i++) {
+        printf("Enter details for employee %d:\n", i + 1);
+        read(&employees[i]);
+    }
+
+    // Display the array of structures
+    for (int i = 0; i < 3; i++) {
+        printf("\nDetails of employee %d:\n", i + 1);
+        display(employees[i]);
+    }
+
+    return 0;
+}
+
+void read(EMP *emp) {
+    printf("Enter name (max 50 characters): ");
+    fgets(emp->name, sizeof(emp->name), stdin);
+    // Remove newline character if present
+    size_t len = strlen(emp->name);
+    if (len > 0 && emp->name[len - 1] == '\n') {
+        emp->name[len - 1] = '\0';
+    }
+
+    printf("Enter age: ");
+    scanf("%u", &emp->age);
+
+    printf("Enter designation (0 for MANAGER, 1 for ENGINEER, 2 for TECHNICIAN, 3 for CLERK): ");
+    int desig;
+    scanf("%d", &desig);
+    emp->designation = (Designation)desig;
+
+    // Clear the input buffer
+    while (getchar() != '\n');
+}
+
+void display(EMP emp) {
+    printf("Name: %s\n", emp.name);
+    printf("Age: %u\n", emp.age);
+    printf("Designation: ");
+    switch (emp.designation) {
+        case MANAGER: printf("MANAGER\n"); break;
+        case ENGINEER: printf("ENGINEER\n"); break;
+        case TECHNICIAN: printf("TECHNICIAN\n"); break;
+        case CLERK: printf("CLERK\n"); break;
+        default: printf("UNKNOWN\n"); break;
+    }
+}
+
+int update(EMP *emp) {
+    printf("Update name (max 50 characters): ");
+    fgets(emp->name, sizeof(emp->name), stdin);
+    // Remove newline character if present
+    size_t len = strlen(emp->name);
+    if (len > 0 && emp->name[len - 1] == '\n') {
+        emp->name[len - 1] = '\0';
+    }
+
+    printf("Update age: ");
+    if (scanf("%u", &emp->age) != 1) {
+        return 0; // Failed to read age
+    }
+
+    printf("Update designation (0 for MANAGER, 1 for ENGINEER, 2 for TECHNICIAN, 3 for CLERK): ");
+    int desig;
+    if (scanf("%d", &desig) != 1) {
+        return 0; // Failed to read designation
+    }
+    emp->designation = (Designation)desig;
+
+    // Clear the input buffer
+    while (getchar() != '\n');
+
+    return 1; // Successfully updated
+}
+
+EMP copy(EMP emp) {
+    EMP new_emp;
+    strcpy(new_emp.name, emp.name);
+    new_emp.age = emp.age;
+    new_emp.designation = emp.designation;
+    return new_emp;
+}

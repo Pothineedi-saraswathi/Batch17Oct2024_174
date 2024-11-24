@@ -1,0 +1,64 @@
+1. WAP to calculate the maximum stack depth of a recursive call to a function. (For eg a factorial function ).
+A. 
+
+#include <stdio.h>
+
+int max_depth = 0;
+int current_depth = 0;
+
+int factorial(int n) {
+    current_depth++;
+    if (current_depth > max_depth) {
+        max_depth = current_depth;
+    }
+
+    if (n <= 1) {
+        current_depth--;
+        return 1;
+    } else {
+        int result = n * factorial(n - 1);
+        current_depth--;
+        return result;
+    }
+}
+
+int main() {
+    int number = 5; // Change this value to test with different numbers
+    int result = factorial(number);
+    printf("Factorial of %d is %d\n", number, result);
+    printf("Maximum stack depth reached: %d\n", max_depth);
+    return 0;
+}
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2. What is tail recursion? Why is it important? Give an example
+A. 
+Tail recursion is a specific form of recursion where the recursive call is the last operation in the function. This means that the function returns the result of the recursive call directly, without performing any additional operations after the call.
+
+Importance of Tail Recursion
+Tail recursion is important because it can be optimized by the compiler to be more efficient. This optimization is known as tail call optimization (TCO). When a function is tail-recursive, the compiler can reuse the current function’s stack frame for the next function call, rather than creating a new one. This reduces the amount of stack space needed and can prevent stack overflow errors in cases of deep recursion.
+
+Example of Tail Recursion
+
+#include <stdio.h>
+
+// Tail-recursive helper function
+int factorial_helper(int n, int accumulator) {
+    if (n <= 1) {
+        return accumulator;
+    } else {
+        return factorial_helper(n - 1, n * accumulator);
+    }
+}
+
+// Tail-recursive factorial function
+int factorial(int n) {
+    return factorial_helper(n, 1);
+}
+
+int main() {
+    int number = 5; // Change this value to test with different numbers
+    int result = factorial(number);
+    printf("Factorial of %d is %d\n", number, result);
+    return 0;
+}
+

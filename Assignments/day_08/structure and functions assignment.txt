@@ -1,0 +1,70 @@
+1. Refer the code in “student.c”. Implement the following requirements.
+a. Change the name member to char * datatype
+b. Add 2 functions below to read and store name and percentage scores from user in student record.
+//pass name address as parameter and read and update name field Return updated name
+char *read_update_name(char *name);
+//pass address of percentage as parameter, read and update percentage field of student record. Also return updated percentage
+int read_update_percentage(int *percent);
+c. Check for memory leaks
+d. Specify atleast 5 dataset used for testing
+Check for memory leak.
+A.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct student {
+    int id;
+    char *name;
+    float percentage;
+};
+
+void func(struct student *record);
+char *read_update_name(char *name);
+float read_update_percentage(float *percent);
+
+int main() {
+    struct student record;
+    record.id = 1;
+    record.name = (char *)malloc(50 * sizeof(char)); // Allocate memory for name
+    if (record.name == NULL) {
+        printf("Memory allocation failed\n");
+        return 1;
+    }
+    strcpy(record.name, "Raju");
+    record.percentage = 86.5;
+
+    // Update name and percentage
+    read_update_name(record.name);
+    read_update_percentage(&record.percentage);
+
+    func(&record);
+
+    // Free allocated memory
+    free(record.name);
+
+    return 0;
+}
+
+void func(struct student *record) {
+    printf("Id is: %d\n", record->id);
+    printf("Name is: %s\n", record->name);
+    printf("Percentage is: %.2f\n", record->percentage);
+}
+
+char *read_update_name(char *name) {
+    printf("Enter new name: ");
+    fgets(name, 50, stdin);
+    // Remove newline character if present
+    size_t len = strlen(name);
+    if (len > 0 && name[len - 1] == '\n') {
+        name[len - 1] = '\0';
+    }
+    return name;
+}
+
+float read_update_percentage(float *percent) {
+    printf("Enter new percentage: ");
+    scanf("%f", percent);
+    return *percent;
+}

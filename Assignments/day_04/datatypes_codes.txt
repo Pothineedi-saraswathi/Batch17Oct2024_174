@@ -1,0 +1,112 @@
+1. WAP to read the following information at run time and to display. Choose appropriate data type and format specifier.
+	1. username [maximum of length 125]
+	2. age
+	3. Salary [float]
+	4. Designation code [as short type with values {1, 2, 3, 4, 5, 6}
+	5. Gender [a single char field]
+A. 
+
+/******************************************************************************************
+DESCRIPTION : Program to read user details and display them
+Date : 05-11-2024
+Name : Pothineedi saraswathi
+*****************************************************************************************/
+
+#include <stdio.h>
+
+int main() {
+    char username[126];  // Maximum length 125 (+1 for null terminator)
+    int age;
+    float salary;
+    short designation;   // For values {1, 2, 3, 4, 5, 6}
+    char gender;
+
+    // Input from the user
+    printf("Enter username (max 125 characters): ");
+    scanf("%125s", username);
+    printf("Enter age: ");
+    scanf("%d", &age);
+    printf("Enter salary: ");
+    scanf("%f", &salary);
+    printf("Enter designation code (1-6): ");
+    scanf("%hd", &designation);
+    printf("Enter gender (M/F): ");
+    scanf(" %c", &gender);
+
+    // Output
+    printf("\nUser Information:\n");
+    printf("Username: %s\n", username);
+    printf("Age: %d\n", age);
+    printf("Salary: %.2f\n", salary);
+    printf("Designation Code: %hd\n", designation);
+    printf("Gender: %c\n", gender);
+
+    return 0;
+}
+-------------------------------------------------------------------------------------------
+2. WAP to read a user choice as ‘y’ or ‘Y’ or ‘n’ or ‘N’ and display read choice as “Yes” or “No” according to the input received.
+‘y’ or ‘Y’à display “Yes”
+‘n’ or ‘N’à display “No”
+
+A. 
+/***************************************************************************************
+DESCRIPTION : Program to read a character ('y', 'Y', 'n', 'N') and display "Yes" or "No"
+Date : 05-11-2024
+Name : Pothineedi Saraswathi
+****************************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h> // For exit()
+
+int main() {
+    char choice;
+
+    printf("Enter your choice (Y/y/N/n): ");
+    scanf(" %c", &choice);
+
+    // Display result based on input
+    switch (choice) {
+        case 'y':
+        case 'Y':
+            printf("Yes\n");
+            break;
+        case 'n':
+        case 'N':
+            printf("No\n");
+            break;
+        default:
+            printf("Invalid character\n");
+            exit(1);
+    }
+
+    return 0;
+}
+-------------------------------------------------------------------------------------------
+3. WAP to read a number in decimal (0-127) and display it in 2 digit hex character.
+
+/*****************************************************************************************
+DESCRIPTION : Program to convert a decimal number (0-127) into 2-digit hexadecimal
+Date : 05-11-2024
+Name : Pothineedi saraswathi
+***************************************************************************************/
+
+#include <stdio.h>
+
+int main() {
+    int number;
+
+    // Input number
+    printf("Enter a number (0-127): ");
+    scanf("%d", &number);
+
+    // Validate range
+    if (number < 0 || number > 127) {
+        printf("Invalid input! Please enter a number between 0 and 127.\n");
+        return 1;
+    }
+
+    // Convert to hexadecimal
+    printf("Hexadecimal representation: %02X\n", number);
+
+    return 0;
+}

@@ -1,0 +1,264 @@
+Structure and Dynamic Memory Management assignments
+Mandatory
+
+1. Refer the question 1 solved in “Structure and function”. Extend the above program to read a number of records from the user as a single command line argument (each record is delimited by a semicolon and record fields are delimited by comma) and store in an array of structures.
+Sample input and output are given below.
+Input: “user1,90;user21,100, userABC,56,userX,40”;
+Output:
+No. of records: 4
+Record 1:
+Name:user1, Percentage:90
+Record 2:
+Name:user21, Percentage:100
+Record 3:
+Name:userABC, Percentage:56
+Record 4:
+Name:userX, Percentage:40
+Implement all required functions and call them to get the desired output.
+Check for memory leak.
+
+A.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_NAME_LENGTH 100
+
+// Define structure for student records
+struct student {
+    char *name;       // Pointer for dynamically allocated name
+    float percentage; // Percentage field
+};
+
+// Function prototypes
+struct student *parse_records(const char *input, int *record_count);
+void display_records(const struct student *records, int record_count);
+void free_records(struct student *records, int record_count);
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s \"name1,percent1;name2,percent2;...\"\n", argv[0]);
+        return 1;
+    }
+
+    int record_count = 0;
+    struct student *records = parse_records(argv[1], &record_count);
+
+    if (records == NULL) {
+        printf("Error parsing records.\n");
+        return 1;
+    }
+
+    // Display parsed records
+    printf("No. of records: %d\n", record_count);
+    display_records(records, record_count);
+
+    // Free allocated memory
+    free_records(records, record_count);
+
+    return 0;
+}
+
+// Function to parse the input string and populate an array of student records
+struct student *parse_records(const char *input, int *record_count) {
+    char *input_copy = strdup(input); // Create a modifiable copy of the input
+    if (!input_copy) {
+        printf("Memory allocation failed for input copy.\n");
+        return NULL;
+    }
+
+    // Count the number of records
+    *record_count = 0;
+    for (const char *ptr = input; *ptr; ptr++) {
+        if (*ptr == ';') {
+            (*record_count)++;
+        }
+    }
+    (*record_count)++; // Add one for the last record without a trailing semicolon
+
+    // Allocate memory for records
+    struct student *records = (struct student *)malloc(*record_count * sizeof(struct student));
+    if (!records) {
+        printf("Memory allocation failed for records.\n");
+        free(input_copy);
+        return NULL;
+    }
+
+    // Tokenize the input string by semicolons
+    char *token = strtok(input_copy, ";");
+    int index = 0;
+
+    while (token != NULL && index < *record_count) {
+        // Tokenize each record by commas
+        char *name = strtok(token, ",");
+        char *percent_str = strtok(NULL, ",");
+
+        if (name && percent_str) {
+            // Allocate memory for name
+            records[index].name = strdup(name);
+            if (!records[index].name) {
+                printf("Memory allocation failed for name.\n");
+                free(input_copy);
+                free_records(records, index);
+                return NULL;
+            }
+            records[index].percentage = atof(percent_str); // Convert percentage to float
+        } else {
+            printf("Invalid record format: %s\n", token);
+            free(input_copy);
+            free_records(records, index);
+            return NULL;
+        }
+
+        token = strtok(NULL, ";");
+        index++;
+    }
+
+    free(input_copy);
+    return records;
+}
+
+// Function to display student records
+void display_records(const struct student *records, int record_count) {
+    for (int i = 0; i < record_count; i++) {
+        printf("\nRecord %d:\n", i + 1);
+        printf("Name: %s, Percentage: %.2f\n", records[i].name, records[i].percentage);
+    }
+}
+
+// Function to free allocated memory for student records
+void free_records(struct student *records, int record_count) {
+    for (int i = 0; i < record_count; i++) {
+        free(records[i].name); // Free memory allocated for name
+    }
+    free(records); // Free the array of records
+}
+-------------------------------------------------------------------------------------------
+2a. Extend Q1. Above and add 3 functions below.
+//to search for a name and to replace it with a user defined name, return replaced string
+char*search_update(char *searchstr, char *replacestr);
+//search and delete the record with given name or percentage value, return SUCCESS on successful delete else FAILURE
+int delete_record(char *searcstr, int percent);
+//search for name and if found create a copy of the record in newstudent
+and return SUCCESS, else FAILURE
+int copy(char *name, struct student **newstudent);
+A.
+/* DESCRIPTION : program to manipulate student records by searching, updating, deleting, and copying
+   Date : 23-11-2024
+   Name : Pothineedi saraswathi
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define SUCCESS 1
+#define FAILURE 0
+
+struct student {
+    char *name;
+    int percentage;
+};
+
+// Function to search for a name and replace it with a user-defined name
+char *search_update(char *searchstr, char *replacestr, struct student *records, int count) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(records[i].name, searchstr) == 0) {
+            free(records[i].name);
+            records[i].name = strdup(replacestr);
+            return records[i].name;
+        }
+    }
+    return NULL;
+}
+
+// Function to search and delete a record with a given name or percentage
+int delete_record(char *searchstr, int percent, struct student **records, int *count) {
+    for (int i = 0; i < *count; i++) {
+        if (strcmp((*records)[i].name, searchstr) == 0 || (*records)[i].percentage == percent) {
+            free((*records)[i].name);
+            for (int j = i; j < *count - 1; j++) {
+                (*records)[j] = (*records)[j + 1];
+            }
+            (*records) = realloc(*records, (*count - 1) * sizeof(struct student));
+            (*count)--;
+            return SUCCESS;
+        }
+    }
+    return FAILURE;
+}
+
+// Function to search for a name and create a copy of the record if found
+int copy(char *name, struct student **newstudent, struct student *records, int count) {
+    for (int i = 0; i < count; i++) {
+        if (strcmp(records[i].name, name) == 0) {
+            *newstudent = malloc(sizeof(struct student));
+            (*newstudent)->name = strdup(records[i].name);
+            (*newstudent)->percentage = records[i].percentage;
+            return SUCCESS;
+        }
+    }
+    return FAILURE;
+}
+
+// Helper function to display records
+void display_records(struct student *records, int count) {
+    for (int i = 0; i < count; i++) {
+        printf("Record %d: Name: %s, Percentage: %d\n", i + 1, records[i].name, records[i].percentage);
+    }
+}
+
+// Main function to test the functionalities
+int main() {
+    int record_count = 3;
+    struct student *records = malloc(record_count * sizeof(struct student));
+
+    // Initializing records
+    records[0].name = strdup("user1");
+    records[0].percentage = 90;
+    records[1].name = strdup("user2");
+    records[1].percentage = 80;
+    records[2].name = strdup("user3");
+    records[2].percentage = 70;
+
+    printf("Initial Records:\n");
+    display_records(records, record_count);
+
+    // Testing search and update
+    printf("\nUpdating 'user2' to 'user22':\n");
+    char *updated_name = search_update("user2", "user22", records, record_count);
+    if (updated_name) {
+        printf("Name updated to: %s\n", updated_name);
+    } else {
+        printf("Name not found for update.\n");
+    }
+    display_records(records, record_count);
+
+    // Testing delete
+    printf("\nDeleting record with name 'user22':\n");
+    if (delete_record("user22", -1, &records, &record_count) == SUCCESS) {
+        printf("Record deleted successfully.\n");
+    } else {
+        printf("Record not found for deletion.\n");
+    }
+    display_records(records, record_count);
+
+    // Testing copy
+    printf("\nCopying record with name 'user3':\n");
+    struct student *copied_record = NULL;
+    if (copy("user3", &copied_record, records, record_count) == SUCCESS) {
+        printf("Copied Record: Name: %s, Percentage: %d\n", copied_record->name, copied_record->percentage);
+        free(copied_record->name);
+        free(copied_record);
+    } else {
+        printf("Record not found for copying.\n");
+    }
+
+    // Free memory
+    for (int i = 0; i < record_count; i++) {
+        free(records[i].name);
+    }
+    free(records);
+
+    return 0;
+}
